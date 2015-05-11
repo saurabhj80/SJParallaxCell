@@ -9,15 +9,7 @@
 import UIKit
 
 public class SJParallaxCell: UITableViewCell {
-
-    var sj_parallaxImage: UIImage? {
-        didSet {
-            if let sj_parallaxImage = sj_parallaxImage {
-                sj_imgView.image = sj_parallaxImage
-            }
-        }
-    }
-
+    
     // Parallax Image view
     private var sj_imgView: UIImageView!
     
@@ -30,8 +22,29 @@ public class SJParallaxCell: UITableViewCell {
         }
     }
     
+    // KVO key path
     private let kKeyPath = "contentOffset"
-
+    
+    // The image from the table view
+    var sj_parallaxImage: UIImage? {
+        didSet {
+            if let sj_parallaxImage = sj_parallaxImage {
+                sj_imgView.image = sj_parallaxImage
+            }
+        }
+    }
+    
+    // The parallax ratio
+    var parallaxRatio: CGFloat = 1.5 {
+        didSet {
+            var rect = sj_imgView.frame
+            rect.size.height *= parallaxRatio
+            sj_imgView.frame = rect
+        }
+    }
+    
+    // MARK: Init
+    
     required public init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         initialSetup()
@@ -47,7 +60,7 @@ public class SJParallaxCell: UITableViewCell {
     }
 
     private func initialSetup() {
-        // important
+        // Important
         clipsToBounds = true
         
         // Set up the image view
@@ -56,10 +69,11 @@ public class SJParallaxCell: UITableViewCell {
         sj_imgView.contentMode = .ScaleAspectFill
         contentView.addSubview(sj_imgView)
         
+        // Set the parallax ratio
         parallaxRatio = 1.5
     }
     
-    
+    // Set the parent table view
     override public func willMoveToSuperview(var newSuperview: UIView?) {
         super.willMoveToSuperview(newSuperview)
         while(newSuperview != nil) {
@@ -71,15 +85,7 @@ public class SJParallaxCell: UITableViewCell {
         }
     }
     
-    // The parallax ratio
-    var parallaxRatio: CGFloat = 1.5 {
-        didSet {
-            var rect = sj_imgView.frame
-            rect.size.height *= parallaxRatio
-            sj_imgView.frame = rect
-        }
-    }
-    
+    // Parallax Effect
     private func update() {
         
         if let parentTableView = parentTableView {
@@ -98,7 +104,6 @@ public class SJParallaxCell: UITableViewCell {
 // MARK: KVO
 extension SJParallaxCell {
     
-    // Set up the key value observing
     private func setUpObserving() {
         parentTableView?.addObserver(self, forKeyPath: kKeyPath, options: .Old | .New, context: nil)
     }
@@ -114,4 +119,3 @@ extension SJParallaxCell {
         }
     }
 }
-
